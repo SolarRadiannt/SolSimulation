@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://bfe5wq32obccl"]
-
-[ext_resource type="Script" uid="uid://bv88vognicxh2" path="res://SolSimulation.Main/Main.cs" id="1_h0veq"]
-
-[node name="Main" type="Node2D" unique_id=1344923854]
-script = ExtResource("1_h0veq")

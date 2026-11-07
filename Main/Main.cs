@@ -1,17 +1,26 @@
 namespace SolSimulation.Main;
 
-using Godot;
 using System;
+using Godot;
+using SolTK;
 
 public partial class Main : Node2D
 {
-	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		IoCManager.OnError = (name, ex) => GD.PushError($"[IoCManager] {name}: {ex.Message}");
+		Scheduler.OnError  = (name, ex) => GD.PushError($"[Scheduler] {name}: {ex.Message}");
+
+		IoCManager.InitAll();
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		Scheduler.ProcessAll(delta);
+	}
+
+	public override void _PhysicsProcess(double delta)
+	{
+		Scheduler.ProcessAllPhysics(delta);
 	}
 }

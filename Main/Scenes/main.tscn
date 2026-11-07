@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://bfe5wq32obccl"]
+
+[ext_resource type="Script" path="res://SolSimulation.Main/Main.cs" id="1_3ws6s"]
+
+[node name="Main" type="Node2D" unique_id=1344923854]
+script = ExtResource("1_3ws6s")
+
+[node name="TestSpawner" type="Marker2D" parent="." unique_id=560110926]
+position = Vector2(562, 320)
+metadata/_edit_group_ = true
