@@ -6,9 +6,13 @@ using Godot;
 using SolTK;
 
 public struct CustomMoveTo;
+
+public record struct MoveAutoRotate(
+    float TurnRate = 5f
+);
 public record struct MoveTo(
     Vec2 Goal,
-    float? ReachDistance = null
+    float ReachDistance = 1
 );
 public readonly record struct EntityMoveToReachedEvent(
     Vec2 Goal
@@ -19,9 +23,9 @@ public readonly record struct EntityMovedEvent(
     Vec2 NewPosition
 );
 
-public struct Motion(float speed)
+public struct Motion(float moveSpeed)
 {
-    public float MoveSpeed = speed;
+    public float MoveSpeed = moveSpeed;
     private Vec2 _moveDir = Vec2.Zero;
     public Vec2 MoveDirection
     {
@@ -30,7 +34,7 @@ public struct Motion(float speed)
             _moveDir = value.Normalized();
         }
     }
-    
+
     public readonly Vec2 MoveVelocity => MoveDirection * MoveSpeed;
 
     public Vec2 VelocityInfluence = Vec2.Zero;
@@ -39,10 +43,10 @@ public struct Motion(float speed)
 
 public class MovementSystem : ISystem
 {
-    private readonly static float REACHED_DIST = 1;
     private readonly static World _world = ECS.World;
-    private readonly static Stream<Transform2D, Motion> _moveables =
-        _world.Stream<Transform2D, Motion>();
+    private readonly static FilteredStream<Transform2D, Motion> _moveables =
+        _world.Stream<Transform2D, Motion>()
+        .Where(static (in motion) => !motion.Velocity.IsZeroApprox());
     private static void MoveEntity(
         float dt,
         in EntityRef entRef,
@@ -52,7 +56,6 @@ public class MovementSystem : ISystem
     {
         var oldPos = transform.Origin;
         var velocity = motion.Velocity;
-        if (velocity == Vec2.Zero) return;
 
         transform.Origin += velocity * dt;
 
@@ -62,11 +65,10 @@ public class MovementSystem : ISystem
             EventBus.RaiseLocal(entRef.Entity, ref moveEvent);
         }
     }
-
-    private readonly static Stream<Transform2D, MoveTo, Motion> _moveToAbles =
-        _world.Query<Transform2D, MoveTo, Motion>()
-            .Not<CustomMoveTo>()
-            .Stream();
+    
+    private readonly static FilteredStream<Transform2D, MoveTo, Motion> _moveToAbles =
+        _world.Stream<Transform2D, MoveTo, Motion>()
+            .Not(Comp<CustomMoveTo>.Plain);
     private static void EntityMoveTo(
         in EntityRef entityRef, 
         ref Transform2D transform,
@@ -76,7 +78,7 @@ public class MovementSystem : ISystem
     {
         var resultant =  moveTo.Goal - transform.Origin;
         float distSq = resultant.LengthSquared();
-        float reachDist = moveTo.ReachDistance ?? REACHED_DIST;
+        float reachDist = moveTo.ReachDistance;
         
         if (distSq <= reachDist * reachDist)
         {
@@ -91,12 +93,39 @@ public class MovementSystem : ISystem
         motion.MoveDirection = resultant / MathF.Sqrt(distSq);
     }
 
+    private readonly static FilteredStream<Transform2D, Motion, MoveAutoRotate> _moveAutoRotateAbles =
+        _world.Stream<Transform2D, Motion, MoveAutoRotate>()
+            .Where(static (in motion) => !motion.MoveDirection.IsZeroApprox());
+    private static void MoveAutoRotate(
+        float dt,
+        ref Transform2D transform,
+        ref Motion motion,
+        ref MoveAutoRotate moveAutoRotate
+    )
+    {
+        float targetAngle = motion.MoveDirection.Angle();
+
+        float angleDiff = Mathf.AngleDifference(transform.Rotation, targetAngle);
+        
+        float step = moveAutoRotate.TurnRate * dt;
+        float newDiff = Mathf.MoveToward(angleDiff, 0f, step);
+        
+        float newAngle = transform.Rotation + newDiff;
+        transform = new(newAngle, transform.Origin);
+    }
+
     public void Init()
     {
         Scheduler.RegisterPhysics(
             static _ => _moveToAbles.For(EntityMoveTo),
             STKPriority.Transformation
         );
+
+        Scheduler.RegisterPhysics(
+            static dt => _moveAutoRotateAbles.For((float)dt, MoveAutoRotate),
+            STKPriority.Transformation - 1 // lowest runs last
+        );
+
         Scheduler.RegisterPhysics(
             static dt => _moveables.For((float)dt, MoveEntity),
             STKPriority.Applying
