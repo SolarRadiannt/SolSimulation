@@ -1,9 +1,18 @@
 namespace SolSimulation.Main.Systems;
 
+using System;
 using fennecs;
 using Godot;
 using SolTK;
-using SolTK.CommonUtil;
+
+public struct CustomMoveTo;
+public record struct MoveTo(
+    Vec2 Goal,
+    float? ReachDistance = null
+);
+public readonly record struct EntityMoveToReachedEvent(
+    Vec2 Goal
+);
 
 public readonly record struct EntityMovedEvent(
     Vec2 LastPosition,
@@ -13,15 +22,24 @@ public readonly record struct EntityMovedEvent(
 public struct Motion(float speed)
 {
     public float MoveSpeed = speed;
-    public Vec2 MoveDirection {get; readonly set => value.Normalized();} = Vec2.Zero;
+    private Vec2 _moveDir = Vec2.Zero;
+    public Vec2 MoveDirection
+    {
+        readonly get => _moveDir;
+        set {
+            _moveDir = value.Normalized();
+        }
+    }
+    
     public readonly Vec2 MoveVelocity => MoveDirection * MoveSpeed;
 
     public Vec2 VelocityInfluence = Vec2.Zero;
     public readonly Vec2 Velocity => MoveVelocity + VelocityInfluence;
 }
 
-public class MovementSystem : ISystem, IProcessable
+public class MovementSystem : ISystem
 {
+    private readonly static float REACHED_DIST = 1;
     private readonly static World _world = ECS.World;
     private readonly static Stream<Transform2D, Motion> _moveables =
         _world.Stream<Transform2D, Motion>();
@@ -45,13 +63,43 @@ public class MovementSystem : ISystem, IProcessable
         }
     }
 
-    public int Priority => STKPriority.Applying;
+    private readonly static Stream<Transform2D, MoveTo, Motion> _moveToAbles =
+        _world.Query<Transform2D, MoveTo, Motion>()
+            .Not<CustomMoveTo>()
+            .Stream();
+    private static void EntityMoveTo(
+        in EntityRef entityRef, 
+        ref Transform2D transform,
+        ref MoveTo moveTo,
+        ref Motion motion
+    )
+    {
+        var resultant =  moveTo.Goal - transform.Origin;
+        float distSq = resultant.LengthSquared();
+        float reachDist = moveTo.ReachDistance ?? REACHED_DIST;
+        
+        if (distSq <= reachDist * reachDist)
+        {
+            entityRef.Remove<MoveTo>();
+            motion.MoveDirection = Vec2.Zero;
+
+            var reachedEvent = new EntityMoveToReachedEvent(moveTo.Goal);
+            EventBus.RaiseLocal(entityRef.Entity, ref reachedEvent);
+            return;
+        }
+
+        motion.MoveDirection = resultant / MathF.Sqrt(distSq);
+    }
+
     public void Init()
     {
-        Scheduler.Register(this);
-    }
-    public void Process(double dt)
-    {
-        _moveables.For((float)dt, MoveEntity);
+        Scheduler.RegisterPhysics(
+            static _ => _moveToAbles.For(EntityMoveTo),
+            STKPriority.Transformation
+        );
+        Scheduler.RegisterPhysics(
+            static dt => _moveables.For((float)dt, MoveEntity),
+            STKPriority.Applying
+        );
     }
 }
