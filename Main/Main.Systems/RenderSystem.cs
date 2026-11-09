@@ -15,7 +15,7 @@ public struct RenderDesc(Shape shape, Color? color = null)
     public bool AntiLiased = false;
 }
 
-public class RenderSystem : ISystem, IProcessable
+public class RenderSystem : ISystem
 {
     private static readonly World _world = ECS.World;
     private readonly static Stream<Transform2D, RenderDesc> _renderables =
@@ -41,7 +41,7 @@ public class RenderSystem : ISystem, IProcessable
                     renderDesc.Shape.HalfExtents.X * 2, 
                     renderDesc.Shape.HalfExtents.Y * 2
                 );
-                var rect = new Rect2(center - size / 2f, size);
+                var rect = new Rect2(center - size * 0.5f, size);
                 RenderingServer.CanvasItemAddRect(
                     _canvasItem,
                     rect,
@@ -52,7 +52,6 @@ public class RenderSystem : ISystem, IProcessable
         }
     }
 
-    public int Priority => STKPriority.Lowest;
     public void Init()
     {
         _canvasItem = RenderingServer.CanvasItemCreate();
@@ -61,12 +60,10 @@ public class RenderSystem : ISystem, IProcessable
             Main.Instance.GetCanvasItem()
         );
 
-        Scheduler.Register(this);
-    }
-
-    public void Process(double _)
-    {
-        RenderingServer.CanvasItemClear(_canvasItem);
-        _renderables.For(Render);
+        Scheduler.Register(_ =>
+        {
+            RenderingServer.CanvasItemClear(_canvasItem);
+            _renderables.For(Render);
+        }, STKPriority.Lowest);
     }
 }
