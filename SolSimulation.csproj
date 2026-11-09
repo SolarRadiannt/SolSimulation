@@ -6,12 +6,11 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Aether.Physics2D" Version="2.2.0" />
     <PackageReference Include="ImGui.NET" Version="1.91.6.1" />
     <PackageReference Include="SolTK" Version="1.0.4" />
     
     <Using Include="Godot.Vector2" Alias="Vec2" />
-    <Using Include="nkast.Aether.Physics2D.Common.Vector2" Alias="AVec2" />
-    <Using Include="SolSimulation.Main.Extensions" />
+    <Using Include="SolSimulation.Main.Extensions" />
+
   </ItemGroup>
 </Project>
