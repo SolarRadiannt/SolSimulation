@@ -46,20 +46,8 @@ public class SpatialSystem  : ISystem, IProcessable
         OverlapParams? spatialParams = null
     )
     {
+        results.Clear();
         _grid.QueryAABB(queryAABB, results, spatialParams?.MaxResults);
-        return results.Count > 0;
-    }
-
-    public bool GetEntitiesInRadius(
-        Vec2 position,
-        float radius,
-        List<Entity> results,
-        OverlapParams? spatialParams = null
-    )
-    {
-        var queryAABB = AABB.FromCenterRadius(position, radius);
-        _grid.QueryAABB(queryAABB, results, spatialParams?.MaxResults);
-        
         return results.Count > 0;
     }
 
