@@ -1,14 +1,14 @@
-using System;
+namespace SolSimulation.Main.Systems;
+
 using System.Collections.Generic;
 using fennecs;
-using ImGuiGodot.Internal;
 using SolTK;
 
-namespace SolSimulation.Main;
+
 
 public struct AgentDisabled;
 
-public readonly struct AgentChangedActionEvent(
+public readonly record struct AgentChangedActionEvent(
     BaseUtilityAction? LastAction,
     BaseUtilityAction NewAction
 );
@@ -29,7 +29,7 @@ public abstract class BaseUtilityAction
     public abstract void Exited(Entity entity);
 }
 
-public class UtilityAI : IService
+public class UtilityAISystem : IService
 {
     private static readonly World _world = ECS.World;
     private static readonly FilteredStream<UtilityAgent> _toEvaluate =
