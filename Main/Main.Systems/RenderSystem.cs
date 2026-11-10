@@ -16,7 +16,7 @@ public struct RenderDesc(Shape shape, Color? color = null)
     public bool AntiLiased = false;
 }
 
-public class RenderSystem : ISystem
+public class RenderSystem : IService
 {
     private static readonly World _world = ECS.World;
     private readonly static FilteredStream<Transform2D, RenderDesc> _renderables =

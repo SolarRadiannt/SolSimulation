@@ -28,7 +28,7 @@ public readonly struct RaycastResult
     public readonly float Distance;
 }
 
-public class SpatialSystem  : ISystem, IProcessable
+public class SpatialSystem  : IService, IProcessable
 {
     private static readonly World _world = ECS.World;
     private readonly SpatialGrid _grid = new(24);

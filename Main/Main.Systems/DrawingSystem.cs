@@ -5,7 +5,7 @@ using SolTK;
 
 
 
-public class DrawingSystem : ISystem, IProcessable
+public class DrawingSystem : IService, IProcessable
 {
     private static bool _toggleDraw = false;
 

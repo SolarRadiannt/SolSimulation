@@ -42,7 +42,7 @@ public struct Motion(float moveSpeed = 400)
     public readonly Vec2 Velocity => MoveVelocity + VelocityInfluence;
 }
 
-public class MovementSystem : ISystem
+public class MovementSystem : IService
 {
     private readonly static World _world = ECS.World;
     private readonly static FilteredStream<Transform2D, Motion> _moveables =

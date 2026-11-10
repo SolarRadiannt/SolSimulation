@@ -10,7 +10,7 @@ using SolTK.Spatials;
 
 public struct PlayerControl;
 
-public class PlayerSystem : ISystem
+public class PlayerSystem : IService
 {
     private readonly static World _world = ECS.World;
     private readonly static Dictionary<StringName, Vec2> _moveNormals = new()
@@ -47,7 +47,7 @@ public class PlayerSystem : ISystem
         
         ECS.Entity("Player")
             .Add(new Motion(400))
-            .Add(new RenderDesc(Shape.Circle(10), new Color("0056d2")))
+            .Add(new RenderDesc(Shape.Circle(10), new("0056d2")))
             .Add(Main.Instance.GetNode<Marker2D>("PlayerSpawn").Transform)
             .Add<PlayerControl>()
             .Add(new MoveAutoRotate());

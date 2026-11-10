@@ -62,7 +62,7 @@ public readonly struct ComponentTypeCache
 // MAIN INSPECTOR CLASS
 // ========================================================================
 
-public class SolInspector : ISystem, IProcessable
+public class SolInspector : IService, IProcessable
 {
 	#region Constants & Static Fields
 	private const string TITLE = "Sol ECS Inspector";
@@ -71,7 +71,7 @@ public class SolInspector : ISystem, IProcessable
 	private const float HORIZONTAL_TAGS_SPACE = 16f;
 
 	private static readonly NumVec4 DefaultColor = new(0.40f, 0.40f, 0.50f, 1.0f);
-	private static readonly NumVec4 Amber = new(1.0f, 0.75f, 0.0f, 1.0f); 
+	private static readonly NumVec4 Amber = new(1.0f, 0.75f, 0.0f, 1.0f);
 	private static readonly InspectorColorAttribute GodotColorAttr = new(InspectColor.Violet);
 
 	private static readonly World world = ECS.World;
@@ -105,8 +105,8 @@ public class SolInspector : ISystem, IProcessable
 		var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 		bool isTag = fields.Length == 0 && properties.Length == 0;
 		string displayName = GetFriendlyTypeName(type);
-		
-		NumVec4 color = DefaultColor; 
+
+		NumVec4 color = DefaultColor;
 		var colorAttr = type.GetCustomAttribute<InspectorColorAttribute>();
 
 		if (typeof(GodotObject).IsAssignableFrom(type))
@@ -172,7 +172,7 @@ public class SolInspector : ISystem, IProcessable
 	private void DisplayResources(Entity entity, HashSet<Entity> visited = null, int depth = 0)
 	{
 		visited ??= [];
-		if (!visited.Add(entity)) return; 
+		if (!visited.Add(entity)) return;
 
 		var snapshot = GetSnapshot(entity);
 
@@ -186,10 +186,10 @@ public class SolInspector : ISystem, IProcessable
 	private void ShowComponents(Entity entity, IReadOnlyList<EntComponentSnapshot> components)
 	{
 		if (components.Count == 0) return;
-		
-		ImGui.PushID(entity.GetHashCode() + 1); 
+
+		ImGui.PushID(entity.GetHashCode() + 1);
 		bool isOpen = ImGui.CollapsingHeader("Components", ImGuiTreeNodeFlags.None);
-		
+
 		if (isOpen)
 		{
 			string filter = HandleEntitySearch("Search Components:", entity, _entitiesComponentFilter);
@@ -207,10 +207,10 @@ public class SolInspector : ISystem, IProcessable
 	private void ShowTags(Entity entity, IReadOnlyList<EntTagSnapshot> tags)
 	{
 		if (tags.Count == 0) return;
-		
+
 		ImGui.PushID(entity.GetHashCode() + 2);
 		bool isOpen = ImGui.CollapsingHeader("Tags", ImGuiTreeNodeFlags.None);
-		
+
 		if (isOpen)
 		{
 			string filter = HandleEntitySearch("Search Tags:", entity, _entitiesTagsFilter);
@@ -233,15 +233,15 @@ public class SolInspector : ISystem, IProcessable
 	private void ShowRelationships(Entity entity, HashSet<Entity> visited, int depth, IReadOnlyList<EntRelationshipSnapshot> relationships)
 	{
 		if (depth > MAX_RELATIONSHIP_DEPTH || relationships.Count == 0) return;
-		
+
 		ImGui.PushID(entity.GetHashCode() + 3);
 		bool isOpen = ImGui.CollapsingHeader($"Relationships ({relationships.Count})", ImGuiTreeNodeFlags.None);
-		
+
 		if (isOpen)
 		{
 			string filter = HandleEntitySearch("Search Relationships:", entity, _entitiesRelationshipsFilter);
 			ImGui.Indent();
-			
+
 			foreach (var rel in relationships)
 			{
 				if (IsFiltered(rel.Label, filter)) continue;
@@ -277,10 +277,10 @@ public class SolInspector : ISystem, IProcessable
 		ImGui.PopStyleColor();
 
 		if (!isOpen) return;
-		
+
 		ImGui.Indent();
 		var cache = GetOrCacheType(comp.Type);
-		
+
 		foreach (var field in cache.Fields)
 			DisplayValue(field.Name, field.GetValue(comp.Value));
 
@@ -299,7 +299,7 @@ public class SolInspector : ISystem, IProcessable
 		if (DisplayPrecise(name, value)) return;
 
 		var type = value.GetType();
-		if (type.IsPrimitive || type.IsEnum || type == typeof(string) || 
+		if (type.IsPrimitive || type.IsEnum || type == typeof(string) ||
 			type == typeof(Vector2) || type == typeof(Vector3) || type == typeof(Vector4))
 		{
 			ImGui.Text($"{name}: {value}");
@@ -361,7 +361,7 @@ public class SolInspector : ISystem, IProcessable
 		ImGui.Dummy(size);
 	}
 
-	private static bool IsFiltered(string target, string filter) 
+	private static bool IsFiltered(string target, string filter)
 		=> !string.IsNullOrWhiteSpace(filter) && !target.Contains(filter, StringComparison.OrdinalIgnoreCase);
 
 	private static void HandleSearch(string title, int uniqueId, ref string filter)
@@ -381,9 +381,9 @@ public class SolInspector : ISystem, IProcessable
 			filter = "";
 			filterDict[entity] = filter;
 		}
-		
+
 		HandleSearch(title, entity.GetHashCode(), ref filter);
-		
+
 		filterDict[entity] = filter;
 		return filter;
 	}
@@ -398,7 +398,7 @@ public class SolInspector : ISystem, IProcessable
 		ImGuiGD.Connect(() =>
 		{
 			ImGui.Begin(TITLE);
-			HandleSearch("Search Entities:", 0, ref _searchFilter); 
+			HandleSearch("Search Entities:", 0, ref _searchFilter);
 			ImGui.Separator();
 			ProcessEntitiesDisplay(world.All);
 			ImGui.End();
@@ -414,7 +414,7 @@ public class SolInspector : ISystem, IProcessable
 		foreach (var comp in entity.Components)
 		{
 			var cache = GetOrCacheType(comp.Type);
-			
+
 			if (cache.IsTag)
 			{
 				tags.Add(new EntTagSnapshot(cache.Type, cache.DisplayName, cache.Color));
@@ -438,7 +438,7 @@ public class SolInspector : ISystem, IProcessable
 	}
 
 	public void Process(double _) => ClearEntitiesFromDicts();
-	
+
 	private void ClearEntitiesFromDicts() =>
 		_despawningEntities.For((in EntityRef entity, ref MarkDespawn _) =>
 		{
