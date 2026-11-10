@@ -6,6 +6,7 @@ using Godot;
 using SolTK;
 using SolTK.Spatials;
 
+public struct HideRender;
 public struct RenderDesc(Shape shape, Color? color = null)
 {
     public readonly static Color DEFAULT_COLOR =
@@ -18,10 +19,11 @@ public struct RenderDesc(Shape shape, Color? color = null)
 public class RenderSystem : ISystem
 {
     private static readonly World _world = ECS.World;
-    private readonly static Stream<Transform2D, RenderDesc> _renderables =
-        _world.Stream<Transform2D, RenderDesc>();
+    private readonly static FilteredStream<Transform2D, RenderDesc> _renderables =
+        _world.Stream<Transform2D, RenderDesc>()
+            .Not(Comp<HideRender>.Plain);
     private Rid _canvasItem;
-    private void Render(ref Transform2D transform, ref RenderDesc renderDesc)
+    private static void Render(Rid canvasItem, ref Transform2D transform, ref RenderDesc renderDesc)
     {
         var center = transform.Origin;  
 
@@ -29,7 +31,7 @@ public class RenderSystem : ISystem
         {
             case Shape.Kind.Circle:
                 RenderingServer.CanvasItemAddCircle(
-                    _canvasItem,
+                    canvasItem,
                     center,
                     renderDesc.Shape.Radius,
                     renderDesc.Color
@@ -43,7 +45,7 @@ public class RenderSystem : ISystem
                 );
                 var rect = new Rect2(center - size * 0.5f, size);
                 RenderingServer.CanvasItemAddRect(
-                    _canvasItem,
+                    canvasItem,
                     rect,
                     renderDesc.Color,
                     renderDesc.AntiLiased
@@ -63,7 +65,7 @@ public class RenderSystem : ISystem
         Scheduler.Register(_ =>
         {
             RenderingServer.CanvasItemClear(_canvasItem);
-            _renderables.For(Render);
+            _renderables.For(_canvasItem, Render);
         }, STKPriority.Lowest);
     }
 }

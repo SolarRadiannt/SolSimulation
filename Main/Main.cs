@@ -1,8 +1,6 @@
 namespace SolSimulation.Main;
 
-using System;
 using Godot;
-using SolSimulation.Main.Systems;
 using SolTK;
 
 public partial class Main : Node2D

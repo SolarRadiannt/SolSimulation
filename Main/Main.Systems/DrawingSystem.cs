@@ -7,6 +7,8 @@ using SolTK;
 
 public class DrawingSystem : ISystem, IProcessable
 {
+    private static bool _toggleDraw = false;
+
     private void SpawnBlob(Vec2 position) =>
         ECS.Entity("Hi")
 			.Add(new Transform2D(0, position))
@@ -22,6 +24,12 @@ public class DrawingSystem : ISystem, IProcessable
 
     public void Process(double _)
     {
+        if (Input.IsActionJustPressed("ToggleDraw"))
+            _toggleDraw = !_toggleDraw;
+        
+        if (!_toggleDraw)
+            return;
+        
         var mousePos = Main.Instance.GetGlobalMousePosition();
         if (Input.IsActionPressed("SpawnHi"))
             SpawnBlob(mousePos);

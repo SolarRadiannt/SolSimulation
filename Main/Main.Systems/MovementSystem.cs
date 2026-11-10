@@ -6,6 +6,7 @@ using Godot;
 using SolTK;
 
 public struct CustomMoveTo;
+public struct CustomAutoRotate;
 
 public record struct MoveAutoRotate(
     float TurnRate = 5f
@@ -23,7 +24,7 @@ public readonly record struct EntityMovedEvent(
     Vec2 NewPosition
 );
 
-public struct Motion(float moveSpeed)
+public struct Motion(float moveSpeed = 400)
 {
     public float MoveSpeed = moveSpeed;
     private Vec2 _moveDir = Vec2.Zero;
@@ -46,7 +47,7 @@ public class MovementSystem : ISystem
     private readonly static World _world = ECS.World;
     private readonly static FilteredStream<Transform2D, Motion> _moveables =
         _world.Stream<Transform2D, Motion>()
-        .Where(static (in motion) => !motion.Velocity.IsZeroApprox());
+        .Where(static (in Motion motion) => !motion.Velocity.IsZeroApprox());
     private static void MoveEntity(
         float dt,
         in EntityRef entRef,
@@ -95,7 +96,8 @@ public class MovementSystem : ISystem
 
     private readonly static FilteredStream<Transform2D, Motion, MoveAutoRotate> _moveAutoRotateAbles =
         _world.Stream<Transform2D, Motion, MoveAutoRotate>()
-            .Where(static (in motion) => !motion.MoveDirection.IsZeroApprox());
+            .Not(Comp<CustomAutoRotate>.Plain)
+            .Where(static (in Motion motion) => !motion.MoveDirection.IsZeroApprox());
     private static void MoveAutoRotate(
         float dt,
         ref Transform2D transform,

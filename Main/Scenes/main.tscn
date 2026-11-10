@@ -5,6 +5,6 @@
 [node name="Main" type="Node2D" unique_id=1344923854]
 script = ExtResource("1_3ws6s")
 
-[node name="TestSpawner" type="Marker2D" parent="." unique_id=560110926]
+[node name="PlayerSpawn" type="Marker2D" parent="." unique_id=560110926]
 position = Vector2(562, 320)
 metadata/_edit_group_ = true
