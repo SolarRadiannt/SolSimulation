@@ -9,24 +9,23 @@ using SolTK;
 public struct AgentDisabled;
 
 public readonly record struct AgentChangedActionEvent(
-    BaseUtilityAction? LastAction,
-    BaseUtilityAction NewAction
+    UtilityAction? OldAction,
+    UtilityAction NewAction
 );
 
-public struct UtilityAgent(IReadOnlyList<BaseUtilityAction> actions)
+public struct UtilityAgent(IReadOnlyList<UtilityAction> actions)
 {
-    public readonly IReadOnlyList<BaseUtilityAction> Actions = actions;
-    public BaseUtilityAction? CurrentAction = null;
+    public readonly IReadOnlyList<UtilityAction> Actions = actions;
+    public UtilityAction? CurrentAction = null;
 }
 
-public abstract class BaseUtilityAction
+public abstract class UtilityAction
 {
-    public abstract float Score(Entity entity);
-
-    public abstract bool CanEnter(Entity entity);
-
-    public abstract void Entered(Entity entity);
-    public abstract void Exited(Entity entity);
+    public abstract float Score(in EntityRef entityRef);
+    public abstract bool CanEnter(in EntityRef entityRef);
+    
+    public abstract void Entered(in EntityRef entityRef);
+    public abstract void Exited(in EntityRef entityRef);
 }
 
 public class UtilityAISystem : IService
@@ -36,11 +35,10 @@ public class UtilityAISystem : IService
         _world.Stream<UtilityAgent>()
             .Not(Comp<AgentDisabled>.Plain)
             .Where(static (in UtilityAgent agent) => agent.Actions.Count > 0);
-    private static void EvaluateAgents(in EntityRef entityRef, ref UtilityAgent agent)
+    private static void EvaluateAgents(in EntityRef entity, ref UtilityAgent agent)
     {
-        BaseUtilityAction bestAction = null;
+        UtilityAction bestAction = null;
         float highestScore = float.MinValue;
-        var entity = entityRef.Entity;
 
         foreach (var action in agent.Actions)
         {
