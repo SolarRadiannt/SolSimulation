@@ -5,7 +5,6 @@ using fennecs;
 using ImGuiGodot;
 using ImGuiNET;
 using SolTK;
-using SolTK.Components;
 using System;
 using System.Reflection;
 using System.Collections.Generic;
@@ -83,6 +82,12 @@ public class SolInspector : IService, IProcessable
 
 	private static readonly Dictionary<Type, MethodInfo> _setMethods = [];
 	private static readonly MethodInfo _setValueMethod = typeof(SolInspector).GetMethod(nameof(SetValue), BindingFlags.NonPublic | BindingFlags.Static);
+
+	/// <summary>
+	/// Global static reference to the active inspector instance.
+	/// Useful for calling from anywhere without dependency injection.
+	/// </summary>
+	public static SolInspector Instance { get; private set; }
 	#endregion
 
 	#region Instance State
@@ -101,22 +106,6 @@ public class SolInspector : IService, IProcessable
 	}
 
 	private readonly Dictionary<Entity, InspectorWindowState> _openInspectors = [];
-	#endregion
-
-	#region Public API
-	/// <summary>
-	/// Pops open (or brings to front) an Inspector window for the specified entity.
-	/// Safe to call from anywhere in your game code.
-	/// </summary>
-	public void OpenInspector(Entity entity)
-	{
-		if (!entity.Alive) return;
-		
-		if (!_openInspectors.ContainsKey(entity))
-		{
-			_openInspectors[entity] = new InspectorWindowState(entity);
-		}
-	}
 	#endregion
 
 	#region Core Data Extraction & Caching
@@ -795,11 +784,12 @@ public class SolInspector : IService, IProcessable
 	}
 	#endregion
 
-	#region Public API & Lifecycle
+	#region Lifecycle
 	public int Priority => SPriority.Lowest;
 
 	public void Init()
 	{
+		Instance = this;
 		Scheduler.Register(this);
 		ImGuiGD.Connect(() =>
 		{
@@ -808,6 +798,26 @@ public class SolInspector : IService, IProcessable
 			DrawComponentEditWindows();
 		});
 	}
+
+	public void Process(double _) => ClearEntitiesFromDicts();
+
+	private void ClearEntitiesFromDicts() =>
+		_despawningEntities.For((in EntityRef entityRef, ref MarkDespawn _) =>
+		{
+			var entity = entityRef.Entity;
+
+			// Cleanup inspector windows if the entity despawns
+			if (_openInspectors.ContainsKey(entity))
+			{
+				_openInspectors.Remove(entity);
+			}
+		});
+	#endregion
+
+	// ========================================================================
+	// PUBLIC API
+	// ========================================================================
+
 
 	public EntSnapshot GetSnapshot(Entity entity)
 	{
@@ -840,19 +850,30 @@ public class SolInspector : IService, IProcessable
 			Relationships = relationships,
 		};
 	}
+	
+	/// <summary>
+	/// Static convenience method to open an inspector window for an entity.
+	/// </summary>
+	public static void Show(Entity entity) => Instance?.OpenInspector(entity);
 
-	public void Process(double _) => ClearEntitiesFromDicts();
-
-	private void ClearEntitiesFromDicts() =>
-		_despawningEntities.For((in EntityRef entityRef, ref MarkDespawn _) =>
+	/// <summary>
+	/// Pops open (or brings to front) an Inspector window for the specified entity.
+	/// </summary>
+	public void OpenInspector(Entity entity)
+	{
+		if (!entity.Alive) return;
+		
+		if (!_openInspectors.ContainsKey(entity))
 		{
-			var entity = entityRef.Entity;
+			_openInspectors[entity] = new InspectorWindowState(entity);
+		}
+	}
 
-			// Cleanup inspector windows if the entity despawns
-			if (_openInspectors.ContainsKey(entity))
-			{
-				_openInspectors.Remove(entity);
-			}
-		});
-	#endregion
+	/// <summary>
+	/// Closes the inspector window for the specified entity.
+	/// </summary>
+	public void CloseInspector(Entity entity)
+	{
+		_openInspectors.Remove(entity);
+	}
 }
