@@ -11,7 +11,7 @@ public class EatAction : UtilityAction
     public override bool CanEnter(in EntityRef entityRef) =>
         entityRef.Has<Stomach>() && entityRef.Has<WantToEat>(Match.Any);
     
-    public override float Score(in EntityRef entityRef) => 0.8f;
+    public override float Score(in EntityRef entityRef) => 1.1f;
     public override void Entered(in EntityRef entityRef)
     {
         entityRef.Add<Eating>();
