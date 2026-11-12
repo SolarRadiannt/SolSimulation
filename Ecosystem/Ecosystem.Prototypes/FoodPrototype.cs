@@ -1,4 +1,4 @@
-namespace SolSimulation.Ecosystem.Systems;
+namespace SolSimulation.Ecosystem.Prototypes;
 
 using fennecs;
 using Godot;
