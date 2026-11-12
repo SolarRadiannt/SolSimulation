@@ -8,7 +8,7 @@ using SolTK.Spatials;
 
 public struct Predator;
 
-public class PredatorPrototype : IService
+public static class PredatorPrototype
 {
     private static readonly World _world = ECS.World;
     private static readonly Shape _shape = Shape.Circle(10);
@@ -28,9 +28,4 @@ public class PredatorPrototype : IService
             .Add(new Motion(_baseSpeed))
             .Add(new MoveAutoRotate(_baseTurnSpeed))
             .Needs<Transform2D>();
-    
-    public void Init()
-    {
-        
-    }
 }

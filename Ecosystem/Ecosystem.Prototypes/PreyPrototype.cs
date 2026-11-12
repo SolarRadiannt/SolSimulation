@@ -10,7 +10,7 @@ using System;
 public struct Prey;
 
 
-public class PreyPrototype : IService
+public static class PreyPrototype
 {
     private static readonly World _world = ECS.World;
     private static readonly Shape _shape = Shape.Circle(10);
@@ -30,10 +30,4 @@ public class PreyPrototype : IService
             .Add(new Motion(_baseSpeed))
             .Add(new MoveAutoRotate(_baseTurnSpeed))
             .Needs<Transform2D>();
-            
-
-    public void Init()
-    {
-        
-    }
 }

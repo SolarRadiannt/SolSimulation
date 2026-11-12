@@ -8,7 +8,7 @@ using SolTK.Spatials;
 
 public struct Food;
 
-public class FoodPrototype : IService
+public static class FoodPrototype
 {
     private static readonly World _world = ECS.World;
     private static readonly Shape _shape = Shape.Circle(10);
@@ -20,9 +20,4 @@ public class FoodPrototype : IService
             .Add(new Collider(_shape))
             .Add(new RenderDesc(_shape, new("#02ff17")))
             .Needs<Transform2D>();
-    
-    public void Init()
-    {
-        
-    }
 }
