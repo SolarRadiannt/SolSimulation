@@ -10,7 +10,7 @@ using System;
 public struct Prey;
 
 
-public class PreySystem : IService
+public class PreyPrototype : IService
 {
     private static readonly World _world = ECS.World;
     private static readonly Shape _shape = Shape.Circle(10);
