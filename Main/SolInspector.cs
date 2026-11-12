@@ -393,23 +393,20 @@ public class SolInspector : IService, IProcessable
 		bool isStruct = comp.Type.IsValueType;
 
 		object boxed = state.PendingEdits.TryGetValue(comp.Type, out var pending) ? pending : comp.Value;
-		bool changed = false;
-		bool committed = false;
+        bool committed = false;
+        foreach (var f in cache.Fields)
+        {
+            var child = f.GetValue(boxed);
+            var (nv, ch, deactField) = DrawValueEditable(f.Name, child, f.FieldType, 0);
+            if (ch)
+            {
+                f.SetValue(boxed, nv);
+                state.PendingEdits[comp.Type] = boxed;
+            }
+            if (deactField) committed = true;
+        }
 
-		foreach (var f in cache.Fields)
-		{
-			var child = f.GetValue(boxed);
-			var (nv, ch, deactField) = DrawValueEditable(f.Name, child, f.FieldType, 0);
-			if (ch) 
-			{ 
-				f.SetValue(boxed, nv); 
-				changed = true; 
-				state.PendingEdits[comp.Type] = boxed; 
-			}
-			if (deactField) committed = true;
-		}
-
-		foreach (var p in cache.Properties)
+        foreach (var p in cache.Properties)
 		{
 			if (p.GetIndexParameters().Length != 0 || !p.CanRead) continue;
 			bool canWrite = p.SetMethod is { IsPublic: true };
@@ -423,9 +420,8 @@ public class SolInspector : IService, IProcessable
 
 				if (canWrite && ch) 
 				{ 
-					p.SetValue(boxed, nv); 
-					changed = true; 
-					state.PendingEdits[comp.Type] = boxed; 
+					p.SetValue(boxed, nv);
+                    state.PendingEdits[comp.Type] = boxed; 
 				}
 				if (deactProp) committed = true;
 			}
