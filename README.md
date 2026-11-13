@@ -1,15 +1,46 @@
-Repo for my various simulation project.
+# SolSimulation - Hybrid ECS - Godot Architecture Prototype
 
-Runs in Godot but the architecture relied heavily on Entities using fennecs (a minimal ECS library) and is Entity-First as most logic will be put onto Entities instead of Nodes.
+**Status:** In Progress (Architectural Prototype)
 
-EcoSystem simulation branch is at: [link here]
+**Stack:** C#, Godot ([RenderingServer](https://docs.godotengine.org/en/stable/classes/class_renderingserver.html)), [fennecs](https://fennecs.net) (ECS)
 
-Available Components currently:
-- Motion - For moving the entities Transform2D.
-- Collider - To be queryable by the SpatialSystem's spatial grid.
-- MoveTo - Will make Motion.MoveDirection to go towards MoveTo.Goal.
-- UtilityAgent - Holds list of actions (UtilityAgent.Actions) to iterate on, check its score and apply the action to UtilityAgent.CurrentAction and Enter the state.
-- RenderDesc - Description of how to render the entity. It takes in what shape to render and the color, then i'll be rendered on RenderSystem via Godot's RenderingServer.
+## Overview
+A simulation project exploring a **hybrid Entity-First architecture** where game logic lives entirely in [fennecs](https://fennecs.net) entities, while Godot is used primarily as a rendering and tooling layer via [RenderingServer](https://docs.godotengine.org/en/stable/classes/class_renderingserver.html). The goal is to keep simulation systems decoupled from the engine's node hierarchy.
 
-Available Tags currently:
-- AgentDisabled - Excludes the entity from UtilityAISystem Evaluation even if it has the UtilityAgent component.
+## Architecture
+- **Simulation World:** fennecs `World` holds all entities, components, and tags.
+- **Systems:** Motion, SpatialSystem (grid query), UtilityAISystem, RenderSystem.
+- **Render Bridge:** `RenderDesc` components are consumed by a render system that issues draw calls through Godot's `RenderingServer`.
+- **Engine Role:** Godot handles lifecycle, windowing, input, and low-level rendering; it does not own simulation logic.
+
+## Current Components
+| Component | Purpose |
+|-----------|---------|
+| `Motion` | Moves entity `Transform2D` |
+| `Collider` | Queryable by `SpatialSystem` spatial grid |
+| `MoveTo` | Drives `Motion` toward a goal |
+| `UtilityAgent` | Holds Utility AI Actions to be evaluated |
+| `RenderDesc` | Shape/color for `RenderingServer` draw calls |
+
+**Tags:** `AgentDisabled` (excluded from UtilityAISystem evaluation)
+
+## How to Run
+1. Prerequisites: [Godot Installation](https://godotengine.org/download/windows/) Choose [Godot Engine – .NET].
+2. Clone the repo.
+3. Open in Godot and run the main scene.
+
+(Currently theres only a drawing system by spawning an Entity on mouse position if held with RenderDesc and Transform2D. Press Space to toggle the drawing)
+
+## What Works Now
+- [x] Core fennecs world initializes.
+- [x] RenderSystem draws entities via `RenderingServer` using `RenderDesc`.
+- [x] Spatial grid queries functional.
+- [x] UtilityAI evaluation loop.
+- [x] Drawing test system.
+
+## Next Steps
+- Refactor input handling into an ECS system.
+- Add a debug overlay using ImGui (already included in `addons/`).
+
+## Branch
+[Ecosystem](https://foo.com)
