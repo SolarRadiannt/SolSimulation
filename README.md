@@ -12,6 +12,7 @@ A simulation project exploring a **hybrid Entity-First architecture** where game
 - **Systems:** Motion, SpatialSystem (grid query), UtilityAISystem, RenderSystem.
 - **Render Bridge:** `RenderDesc` components are consumed by a render system that issues draw calls through Godot's `RenderingServer`.
 - **Engine Role:** Godot handles lifecycle, windowing, input, and low-level rendering; it does not own simulation logic.
+- **UtilityAI:** a scoring-based AI framework where actions are evaluated by weighted considerations.
 
 ## Current Components
 | Component | Purpose |
@@ -19,7 +20,7 @@ A simulation project exploring a **hybrid Entity-First architecture** where game
 | `Motion` | Moves entity `Transform2D` |
 | `Collider` | Queryable by `SpatialSystem` spatial grid |
 | `MoveTo` | Drives `Motion` toward a goal |
-| `UtilityAgent` | Holds Utility AI Actions to be evaluated |
+| `UtilityAgent` | Holds UtilityAI Actions to be evaluated |
 | `RenderDesc` | Shape/color for `RenderingServer` draw calls |
 
 **Tags:** `AgentDisabled` (excluded from UtilityAISystem evaluation)
@@ -37,10 +38,13 @@ Currently, the project includes a drawing test system: hold the mouse button to 
 - [x] Spatial grid queries functional.
 - [x] UtilityAI evaluation loop.
 - [x] Drawing test system.
+- [x] ECS Inspector using ImGui with the capability to view entities Components/Tags and edit Components. 
 
 ## Next Steps
-- Refactor input handling into an ECS system.
-- Add a debug overlay using ImGui (already included in `addons/`).
+- Narrow phase for SpatialSystem, currently they only have QueryBroadAABB.
+- Raycast method in SpatialSystem.
+- Add Component/Tags capability for the ECS Inspector.
+- sprite render support for RenderDesc.
 
 ## Branch
 [Ecosystem](https://foo.com)
