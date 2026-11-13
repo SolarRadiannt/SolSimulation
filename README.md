@@ -44,7 +44,7 @@ Currently, the project includes a drawing test system: hold the mouse button to 
 - Narrow phase for SpatialSystem, currently they only have QueryBroadAABB.
 - Raycast method in SpatialSystem.
 - Add Component/Tags capability for the ECS Inspector.
-- sprite render support for RenderDesc.
+- Sprite render support for RenderDesc.
 
 ## Branch
 [Ecosystem](https://foo.com)
