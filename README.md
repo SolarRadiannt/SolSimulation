@@ -5,7 +5,7 @@
 **Stack:** C#, Godot ([RenderingServer](https://docs.godotengine.org/en/stable/classes/class_renderingserver.html)), [fennecs](https://fennecs.net) (ECS)
 
 ## Overview
-A simulation project exploring a **hybrid Entity-First architecture** where game logic lives entirely in [fennecs](https://fennecs.net) entities, while Godot is used primarily as a rendering and tooling layer via [RenderingServer](https://docs.godotengine.org/en/stable/classes/class_renderingserver.html). The goal is to keep simulation systems decoupled from the engine's node hierarchy.
+A simulation project exploring a **hybrid Entity-First architecture** where game logic lives entirely in [fennecs](https://fennecs.net) `World`, while Godot is used primarily as a rendering and tooling layer via [RenderingServer](https://docs.godotengine.org/en/stable/classes/class_renderingserver.html). The goal is to keep simulation systems decoupled from the engine's node hierarchy.
 
 ## Architecture
 - **Simulation World:** fennecs `World` holds all entities, components, and tags.
