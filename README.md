@@ -48,4 +48,4 @@ Currently, the project includes a drawing test system: hold the mouse button to 
 - abstract EntitySystem class that systems should later inherit from to get common methods and fields in scopes instead of getting it manually.
 
 ## Branch
-[Ecosystem](https://foo.com)
+[Ecosystem](https://github.com/SolarRadiannt/SolSimulation/tree/ecosystem_simulation)
