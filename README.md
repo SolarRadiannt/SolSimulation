@@ -45,6 +45,7 @@ Currently, the project includes a drawing test system: hold the mouse button to 
 - Raycast method in SpatialSystem.
 - Add Component/Tags capability for the ECS Inspector.
 - Sprite render support for RenderDesc.
+- abstract EntitySystem class that systems should later inherit from to get common methods and fields in scopes instead of getting it manually.
 
 ## Branch
 [Ecosystem](https://foo.com)
