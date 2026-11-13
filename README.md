@@ -29,7 +29,7 @@ A simulation project exploring a **hybrid Entity-First architecture** where game
 2. Clone the repo.
 3. Open in Godot and run the main scene.
 
-(Currently theres only a drawing system by spawning an Entity on mouse position if held with RenderDesc and Transform2D. Press Space to toggle the drawing)
+Currently, the project includes a drawing test system: hold the mouse button to spawn an entity with RenderDesc and Transform2D at the mouse position. **Press Space to toggle drawing**.
 
 ## What Works Now
 - [x] Core fennecs world initializes.
