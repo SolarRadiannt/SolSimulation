@@ -2,7 +2,7 @@ Repo for my various simulation project.
 
 Runs in Godot but the architecture relied heavily on Entities using fennecs (a minimal ECS library) and is Entity-First as most logic will be put onto Entities instead of Nodes.
 
-EcoSystem branch is at: [link here]
+EcoSystem simulation branch is at: [link here]
 
 Available Components currently:
 - Motion - For moving the entities Transform2D.
