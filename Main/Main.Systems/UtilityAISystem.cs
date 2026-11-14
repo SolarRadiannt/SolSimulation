@@ -68,7 +68,7 @@ public class UtilityAISystem : IService
 
     public void Init()
     {
-        Scheduler.RegisterPhysics(
+        Scheduler.RegisterSimulation(
             static _ => _toEvaluate.For(EvaluateAgents),
             STKPriority.Transformation
         );
