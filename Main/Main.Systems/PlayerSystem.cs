@@ -40,7 +40,7 @@ public class PlayerSystem : IService
 
     public void Init()
     {
-        Scheduler.RegisterPhysics(
+        Scheduler.RegisterSimulation(
             static _ => _playerMoveables.For(ControlMovement),
             STKPriority.Transformation
         );

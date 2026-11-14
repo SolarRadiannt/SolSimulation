@@ -1,5 +1,6 @@
 namespace SolSimulation.Main;
 
+using System;
 using Godot;
 using SolTK;
 
@@ -19,11 +20,13 @@ public partial class Main : Node2D
 
 	public override void _Process(double delta)
 	{
+		CentralClock.TickReal();
 		Scheduler.ProcessAll(delta);
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
-		Scheduler.ProcessAllPhysics(delta);
+		CentralClock.TickSimulation(TimeSpan.FromSeconds(delta));
+		Scheduler.ProcessAllSimulation(delta);
 	}
 }

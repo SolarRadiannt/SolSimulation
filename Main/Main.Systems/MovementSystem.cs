@@ -118,17 +118,17 @@ public class MovementSystem : IService
 
     public void Init()
     {
-        Scheduler.RegisterPhysics(
+        Scheduler.RegisterSimulation(
             static _ => _moveToAbles.For(EntityMoveTo),
             STKPriority.Transformation
         );
 
-        Scheduler.RegisterPhysics(
+        Scheduler.RegisterSimulation(
             static dt => _moveAutoRotateAbles.For((float)dt, MoveAutoRotate),
             STKPriority.Transformation - 1 // lowest runs last
         );
 
-        Scheduler.RegisterPhysics(
+        Scheduler.RegisterSimulation(
             static dt => _moveables.For((float)dt, MoveEntity),
             STKPriority.Applying
         );

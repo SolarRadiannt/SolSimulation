@@ -64,7 +64,7 @@ public readonly struct ComponentTypeCache
 // MAIN INSPECTOR CLASS
 // ========================================================================
 
-public class SolInspector : IService, IProcessable
+public class SolInspector : IService
 {
 	#region Constants & Static Fields
 	private const string TITLE = "Sol ECS Entities";
@@ -781,12 +781,10 @@ public class SolInspector : IService, IProcessable
 	#endregion
 
 	#region Lifecycle
-	public int Priority => SPriority.Lowest;
-
 	public void Init()
 	{
 		Instance = this;
-		Scheduler.Register(this);
+		Scheduler.Register(_ => _despawningEntities.For(ClearEntitiesFromDicts), STKPriority.Lowest);
 		ImGuiGD.Connect(() =>
 		{
 			DrawMainWindow();
@@ -795,19 +793,16 @@ public class SolInspector : IService, IProcessable
 		});
 	}
 
-	public void Process(double _) => ClearEntitiesFromDicts();
+	private void ClearEntitiesFromDicts(in EntityRef entityRef, ref MarkDespawn _)
+	{
+		var entity = entityRef.Entity;
 
-	private void ClearEntitiesFromDicts() =>
-		_despawningEntities.For((in EntityRef entityRef, ref MarkDespawn _) =>
+		// Cleanup inspector windows if the entity despawns
+		if (_openInspectors.ContainsKey(entity))
 		{
-			var entity = entityRef.Entity;
-
-			// Cleanup inspector windows if the entity despawns
-			if (_openInspectors.ContainsKey(entity))
-			{
-				_openInspectors.Remove(entity);
-			}
-		});
+			_openInspectors.Remove(entity);
+		}
+	}
 	#endregion
 
 	// ========================================================================

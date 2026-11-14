@@ -70,7 +70,7 @@ public class SpatialSystem  : IService, IProcessable
     public int Priority => STKPriority.Applying - 10;
     public void Init()
     {
-        Scheduler.RegisterPhysics(this);
+        Scheduler.RegisterSimulation(this);
     }
 
     public void Process(double dt)
