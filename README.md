@@ -22,6 +22,7 @@ A simulation project exploring a **hybrid Entity-First architecture** where game
 | `MoveTo` | Drives `Motion` toward a goal |
 | `UtilityAgent` | Holds UtilityAI Actions to be evaluated |
 | `RenderDesc` | Shape/color for `RenderingServer` draw calls |
+| `Stomach` | To make creatures be able to starve and a needs to search/hunt for food |
 
 **Tags:** `AgentDisabled` (excluded from UtilityAISystem evaluation)
 
